@@ -17,6 +17,8 @@ function LoginPage() {
             navigate("/home");
         } catch {
             setErrorMessage("Invalid login. Ensure username or password is correct.");
+            setUsername("");
+            setPassword("");
         }
     }
 
