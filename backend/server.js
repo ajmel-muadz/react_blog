@@ -165,16 +165,19 @@ passport.deserializeUser(async (id, done) => {
 
 // Route handlers (IMPORTANT NOTE: This is API. So everything pre-fixed with API.)
 /* ---------------------------------------------------------------------------------------- */
+// Login page
 app.post("/api/login", passport.authenticate("local"), (req, res) => {
     res.json({message: "Logged in", user: req.user.username});
 });
 
+// Home page
 app.get("/api/home", async (req, res) => {
     const query = req.query.search;
     const posts = await getPostsAndAddUsername(query);
     res.json({posts: posts})
 });
 
+// For displaying a post in detail
 app.get("/api/post/:postId", async (req, res) => {
     const post = await Post.findOne({_id: req.params.postId});
     const postCreatedById = post.createdBy;
@@ -188,14 +191,33 @@ app.get("/api/post/:postId", async (req, res) => {
     res.json({post: modifiedPost});
 });
 
-app.get("/user/:username", async (req, res) => {
+// For displaying an author profile page
+app.get("/api/user/:username", async (req, res) => {
     const user = await User.findOne({username: req.params.username})
     const userId = user._id;
 
     const userPosts = await Post.find({createdBy: userId});
 
     res.json({usersPosts: userPosts});
-})
+});
+
+// For editing a post
+app.post("/api/post/:postId/edit", async (req, res) => {
+    const title = req.body.title;
+    const content = req.body.content;
+    const tags = req.body.tags;
+    const tagsArray = tags.split(" ");
+
+    await Post.findOneAndUpdate({_id: req.params.postId},
+        {
+            title: title,
+            content: content,
+            tags: tagsArray
+        }
+    );
+
+    res.json({message: "Post edited successfully."})
+});
 /* ---------------------------------------------------------------------------------------- */
 
 

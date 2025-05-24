@@ -10,7 +10,7 @@ function PostDetailsPage() {
 
     useEffect(() => {
         if (localStorage.getItem('user') === '') {
-            navigate('/home');
+            navigate('/login');
         }
     });
     
@@ -34,7 +34,7 @@ function PostDetailsPage() {
                         <div className="main-page d-flex flex-column">
                             <h1 className="text-center mx-5 my-3">Post Details: "{post.title}"</h1>
                             <ul className="px-0">
-                                <div className="container my-3 py-4 px-4 bg-dark text-white rounded-3 shadow-lg">
+                                <div className="container mt-5 mb-2 py-4 px-4 bg-dark text-white rounded-3 shadow-lg">
                                     <h3>{post.title}</h3>
                                     <p>{post.content}</p>
                                     <strong>Tags: </strong>
@@ -47,6 +47,15 @@ function PostDetailsPage() {
                                     <strong>Created at: </strong>
                                     <span>{post.createdAt}</span>
                                 </div>
+
+                                {/* If the current user matches post author, allow editing or delete. */}
+                                {localStorage.getItem('user') === post.createdBy ?
+                                <div className="d-flex flex-row">
+                                    <button className="btn btn-danger shadow me-3">Delete</button>
+                                    <Link to={`/post/${postId}/edit`}>
+                                        <button className="btn btn-warning shadow">Edit</button>
+                                    </Link>
+                                </div> : null}
                             </ul>
                         </div>
                     </div>

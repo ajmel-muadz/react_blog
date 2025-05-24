@@ -10,12 +10,12 @@ function AuthorProfilePage() {
 
     useEffect(() => {
         if (localStorage.getItem('user') === '') {
-            navigate('/home');
+            navigate('/login');
         }
     });
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/user/${username}`)
+        axios.get(`http://localhost:5000/api/user/${username}`)
             .then(res => {
                 setPosts(res.data.usersPosts);
             })

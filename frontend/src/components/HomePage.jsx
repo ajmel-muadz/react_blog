@@ -55,7 +55,7 @@ function HomePage() {
                                     {(post.tags).map(tag => <span key={tag}>#{tag} </span>)}
                                     <br />
                                     <strong>Created by: </strong>
-                                    <span>{post.createdBy}</span>
+                                    <Link to={`/user/${post.createdBy}`} onClick={event => event.stopPropagation()}>{post.createdBy}</Link>
                                     <br />
                                 </div>)}
                             </ul>

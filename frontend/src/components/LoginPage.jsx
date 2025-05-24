@@ -7,6 +7,7 @@ import flash from 'express-flash';
 function LoginPage() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
@@ -20,7 +21,6 @@ function LoginPage() {
         try {
             const res = await axios.post("http://localhost:5000/api/login", {username, password}
             );
-            console.log(res.data);
             localStorage.setItem('user', res.data.user);
             navigate("/home");
         } catch {
