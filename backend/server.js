@@ -22,7 +22,10 @@ const saltRounds = 10;
 // Use commands
 /* ---------------------------------------------------------------------------------------- */
 app.use(flash());
-app.use(cors({ credentials: true }));
+app.use(cors({
+    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(flash());
@@ -30,6 +33,7 @@ app.use(session({
     secret: 'secret-here',
     resave: false,
     saveUninitialized: false,
+    cookie: {secure: false, httpOnly: true}
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -163,6 +167,12 @@ passport.deserializeUser(async (id, done) => {
 /* ---------------------------------------------------------------------------------------- */
 app.post("/api/login", passport.authenticate("local"), (req, res) => {
     res.json({message: "Logged in", user: req.user.username});
+});
+
+app.get("/api/home", async (req, res) => {
+    const query = req.query.search;
+    const posts = await getPostsAndAddUsername(query);
+    res.json({posts: posts})
 });
 /* ---------------------------------------------------------------------------------------- */
 

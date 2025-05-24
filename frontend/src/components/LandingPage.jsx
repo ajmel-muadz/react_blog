@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 function LandingPage() {
     return (
         <>
-            <Navbar></Navbar>
+            <Navbar type="minimal"></Navbar>
             <div className="main-page d-flex flex-column justify-content-center align-items-center" style={{height: "90vh"}}>
                 <h1 className="text-center mx-5 my-3">
                     Welcome to Ajmel's (React) Blog Post Management System

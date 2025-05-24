@@ -1,5 +1,6 @@
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
+import HomePage from './components/HomePage';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
         <Route path="/" element={<LandingPage/>} />
         <Route path="/login" element={<LoginPage/>} />
         <Route path="/register" element="Register page" />
+        <Route path="/home" element={<HomePage/>} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </>

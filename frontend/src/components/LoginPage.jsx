@@ -12,11 +12,13 @@ function LoginPage() {
 
     const handleLogin = async () => {
         try {
-            const res = await axios.post("http://localhost:5000/api/login", {username, password});
+            const res = await axios.post("http://localhost:5000/api/login", {username, password}
+            );
             console.log(res.data);
+            localStorage.setItem('user', res.data.user);
             navigate("/home");
         } catch {
-            setErrorMessage("Invalid login. Ensure username or password is correct.");
+            setErrorMessage("Invalid login. Ensure username or password is correct (or username exists).");
             setUsername("");
             setPassword("");
         }
@@ -24,7 +26,7 @@ function LoginPage() {
 
     return (
         <>
-            <Navbar></Navbar>
+            <Navbar type="minimal"></Navbar>
             <div className="container-fluid mx-0 px-0">
                 <div className="row mx-0 px-0">
                     <div className="col-3"></div>
