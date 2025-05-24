@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Navbar(props) {
     const [username, setUsername] = useState(localStorage.getItem(''));
@@ -45,9 +45,7 @@ function Navbar(props) {
 
                         <div className="collapse navbar-collapse" id="navbarSupportedContent">
                             <div className="navbar-nav me-auto mb-2 mb-lg-0">
-                                <div className="d-flex ps-0" style={{padding: "8px"}}>
-                                    <button className="nav-link text-white text-center" id="logoutLink" type="submit" style={{background: "none", border: "none", padding: "0", cursor: "pointer"}}>Log Out</button>
-                                </div>
+                                <Link onClick={() => localStorage.setItem('user', '')} className="nav-link text-white" id="logoutLink" to="/login">Logout</Link>
                                 <Link className="nav-link text-white" id="homeLink" to="/home">Home</Link>
                                 <Link className="nav-link text-white" id="myBlogsLink" to="/myblogs">My Blogs</Link>
                             </div>

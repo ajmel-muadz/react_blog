@@ -1,7 +1,16 @@
 import Navbar from './Navbar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 function LandingPage() {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (localStorage.getItem('user') != '') {
+            navigate("/home");
+        }
+    });
+
     return (
         <>
             <Navbar type="minimal"></Navbar>

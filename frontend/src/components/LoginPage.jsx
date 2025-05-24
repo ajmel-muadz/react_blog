@@ -1,7 +1,7 @@
 import Navbar from './Navbar';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import flash from 'express-flash';
 
 function LoginPage() {
@@ -9,6 +9,12 @@ function LoginPage() {
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (localStorage.getItem('user') != '') {
+            navigate("/home");
+        }
+    });
 
     const handleLogin = async () => {
         try {

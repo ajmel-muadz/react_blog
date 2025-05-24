@@ -174,6 +174,28 @@ app.get("/api/home", async (req, res) => {
     const posts = await getPostsAndAddUsername(query);
     res.json({posts: posts})
 });
+
+app.get("/api/post/:postId", async (req, res) => {
+    const post = await Post.findOne({_id: req.params.postId});
+    const postCreatedById = post.createdBy;
+    const user = await User.findOne({_id: postCreatedById});
+    const username = user.username;
+
+    // Have to do all this because for some reason I cannot directly modify post.
+    modifiedPost = {_id: post._id, title: post.title, content: post.content, tags: post.tags,
+    createdBy: username, createdAt: post.createdAt, __v: post.__v};
+
+    res.json({post: modifiedPost});
+});
+
+app.get("/user/:username", async (req, res) => {
+    const user = await User.findOne({username: req.params.username})
+    const userId = user._id;
+
+    const userPosts = await Post.find({createdBy: userId});
+
+    res.json({usersPosts: userPosts});
+})
 /* ---------------------------------------------------------------------------------------- */
 
 

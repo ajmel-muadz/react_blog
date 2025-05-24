@@ -1,19 +1,18 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
-import { valid } from '@hapi/joi';
 
 function HomePage() {
-    const [username, setUsername] = useState(localStorage.getItem(''));
+    const [username, setUsername] = useState('');
     const [posts, setPosts] = useState([]);  // Initially empty array
+    const navigate = useNavigate();
 
-    // useEffect helps run without crashing as it only executes after rendering everything.
     useEffect(() => {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser != '') {
-            setUsername(storedUser);
+        if (localStorage.getItem('user') === '') {
+            navigate("/login");
         }
-    }, []);
+    });
 
     // GET request for all posts from the server.
     useEffect(() => {
@@ -28,26 +27,36 @@ function HomePage() {
 
     return (
         <>
+            <style>
+                {`#postDivs:hover {
+                    background-color: #424649 !important;
+                }`}
+            </style>
+
             <Navbar type="home"></Navbar>
             <div className="container-fluid mx-0 px-0">
                 <div className="row mx-0 px-0">
-                    <div className="col-3"></div>
+                    <div className="col-3">
+                        <div className="d-flex flex-column">
+                            <h1 className='text-center mx-5 my-3'>Users</h1>
+                            <div className="container my-3 py-4 px-4 bg-dark text-white rounded-3 shadow-lg">
+                            </div>
+                        </div>
+                    </div>
                     <div className="col-6">
                         <div className="main-page d-flex flex-column">
                             <h1 className="text-center mx-5 my-3">All Posts</h1>
                             <ul className="px-0">
                                 {posts.map(post =>
-                                <div key={post._id} className="container my-3 py-4 px-4 bg-dark text-white rounded-3 shadow-lg">
+                                // Allow clicking on div to go to a specific post.
+                                <div key={post._id} onClick={() => navigate(`/post/${post._id}`)} id="postDivs" className="container my-3 py-4 px-4 bg-dark text-white rounded-3 shadow-lg" style={{cursor: "pointer"}}>
                                     <h3>{post.title}</h3>
-                                    <p>{post.content}</p>
                                     <strong>Tags: </strong>
-                                    {(post.tags).map(tag => <span>#{tag} </span>)}
-                                    <br/>
+                                    {(post.tags).map(tag => <span key={tag}>#{tag} </span>)}
+                                    <br />
                                     <strong>Created by: </strong>
                                     <span>{post.createdBy}</span>
-                                    <br/>
-                                    <strong>Created at: </strong>
-                                    <span>{post.createdAt}</span>
+                                    <br />
                                 </div>)}
                             </ul>
                         </div>
