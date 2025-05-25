@@ -232,22 +232,25 @@ const server = app.listen(5000, () => {
 
 const io = new Server(server, {
     cors: {
-        origin: "http://127.0.0.1:5173",
+        origin: ["http://127.0.0.1:5173", "http://localhost:5173"],
         methods: ["GET", "POST"]
     }
 });
 
+// Used to show the active users on this blog site.
 const activeUsers = {};
 io.on('connection', socket => {
     socket.on('user_connection', (username) => {
-        activeUsers[socket.id] = username;
-        console.log(activeUsers);
+        // Used to test if value in object. Credit: https://stackoverflow.com/a/57944826/14367246
+        let alreadyConnected = Object.values(activeUsers).includes(username);
+        if (!alreadyConnected) {
+            activeUsers[socket.id] = username;
+        }
         io.emit('active_users', activeUsers);
     })
 
     socket.on('disconnect', () => {
         delete activeUsers[socket.id];
-        console.log(activeUsers);
         io.emit('active_users', activeUsers)
     })
 })

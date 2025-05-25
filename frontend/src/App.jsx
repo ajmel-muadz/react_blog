@@ -25,7 +25,7 @@ function App() {
     socket.on('active_users', (data) => {
       setActiveUsers(data);
     })
-  }, [socket]);
+  }, []);
 
   console.log(activeUsers);
 
