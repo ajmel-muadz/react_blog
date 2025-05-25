@@ -7,6 +7,7 @@ function HomePage(props) {
     const [posts, setPosts] = useState([]);  // Initially empty array
     const [activeUsersObject, setActiveUsersObject] = useState({});
     const [activeUsers, setActiveUsers] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
 
     // Now opposite. If the user is unauthorised, we want to go back.
@@ -24,14 +25,16 @@ function HomePage(props) {
 
     // GET request for all posts from the server.
     useEffect(() => {
-        axios.get("http://localhost:5000/api/home")
+        axios.get("http://localhost:5000/api/home", { params: {
+            search: searchQuery
+        }})
             .then(res => {
                 setPosts(res.data.posts);
             })
             .catch(err => {
                 console.log(err);
             });
-    }, []);
+    }, [searchQuery]);
 
     // Used to set active users into an object from the props we received.
     useEffect(() => {
@@ -55,7 +58,7 @@ function HomePage(props) {
                 }`}
             </style>
 
-            <Navbar type="home"></Navbar>
+            <Navbar type="home" searchQuery={searchQuery} setSearchQuery={setSearchQuery}></Navbar>
             <div className="container-fluid mx-0 px-0">
                 <div className="row mx-0 px-0">
                     <div className="col-3">

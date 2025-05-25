@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 
 function Navbar(props) {
     const [username, setUsername] = useState(localStorage.getItem(''));
+    const [inputValue, setInputValue] = useState('');
+
     // useEffect helps run without crashing as it only executes after rendering everything.
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
@@ -11,6 +13,11 @@ function Navbar(props) {
             setUsername(storedUser);
         }
     }, []);
+
+    // This ensures that only when the button is clicked, we set the serach query.
+    const handleSearch = () => {
+        props.setSearchQuery(inputValue);
+    }
 
     if (props.type === "minimal") {
         // Simple navbar seen in landing page, login and register.
@@ -50,8 +57,8 @@ function Navbar(props) {
                                 <Link className='nav-link text-white' id="newPostLink" to="/newpost">New Post</Link>
                             </div>
                             <div className="d-flex">
-                                <input className="form-control me-2" name="search" type="search" placeholder="Search with title or tags" aria-label="Search" />
-                                <button className="btn btn-success" type="submit">Search</button>
+                                <input value={inputValue} onChange={e => setInputValue(e.target.value)} className="form-control me-2" name="search" type="search" placeholder="Search with title or tags" aria-label="Search" />
+                                <button onClick={handleSearch} className="btn btn-success" type="submit">Search</button>
                             </div>
                         </div>
                     </div>
