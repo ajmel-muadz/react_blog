@@ -31,7 +31,7 @@ function Navbar(props) {
         return (
             <>
                 <style>
-                    {`#logoutLink:hover, #myBlogsLink:hover {
+                    {`#logoutLink:hover, #myBlogsLink:hover, #homeLink:hover, #newPostLink:hover {
                         color: rgb(188, 186, 186) !important;
                     }`}
                 </style>
@@ -47,7 +47,7 @@ function Navbar(props) {
                             <div className="navbar-nav me-auto mb-2 mb-lg-0">
                                 <Link onClick={() => localStorage.setItem('user', '')} className="nav-link text-white" id="logoutLink" to="/login">Logout</Link>
                                 <Link className="nav-link text-white" id="homeLink" to="/home">Home</Link>
-                                <Link className="nav-link text-white" id="myBlogsLink" to="/myblogs">My Blogs</Link>
+                                <Link className='nav-link text-white' id="newPostLink" to="/newpost">New Post</Link>
                             </div>
                             <div className="d-flex">
                                 <input className="form-control me-2" name="search" type="search" placeholder="Search with title or tags" aria-label="Search" />

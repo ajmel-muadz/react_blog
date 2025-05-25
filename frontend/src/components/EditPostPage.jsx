@@ -44,7 +44,7 @@ function EditPostPage() {
 
     const handleEdit = async () => {
         try {
-            const res = await axios.post(`http://localhost:5000/api/post/${postId}/edit`,
+            await axios.post(`http://localhost:5000/api/post/${postId}/edit`,
                 {title: editTitle, content: editContent, tags: editTag});
 
             navigate("/home");

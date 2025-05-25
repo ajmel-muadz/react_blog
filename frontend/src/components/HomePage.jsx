@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 
 function HomePage(props) {
-    const [username, setUsername] = useState('');
     const [posts, setPosts] = useState([]);  // Initially empty array
     const [activeUsersObject, setActiveUsersObject] = useState({});
     const [activeUsers, setActiveUsers] = useState([]);
@@ -34,10 +33,12 @@ function HomePage(props) {
             });
     }, []);
 
+    // Used to set active users into an object from the props we received.
     useEffect(() => {
         setActiveUsersObject(props.activeUsers);
     }, [props.activeUsers]) // Every time this changes we want to update again.
 
+    // Extract active user objects values and put them into arrays.
     useEffect(() => {
         const array = []
         for (const [key, value] of Object.entries(activeUsersObject)) {

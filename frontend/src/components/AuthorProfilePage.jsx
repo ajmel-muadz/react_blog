@@ -7,7 +7,11 @@ function AuthorProfilePage() {
     const [posts, setPosts] = useState([]);
     const { username } = useParams();
     const [postId, setPostId] = useState('');
+    const [subscriptionStatus, setSubscriptionStatus] = useState('');
     const navigate = useNavigate();
+
+    const myUsername = localStorage.getItem('user');
+    const authorUsername = username;
 
     // Now opposite. If the user is unauthorised, we want to go back.
     useEffect(() => {
@@ -22,6 +26,7 @@ function AuthorProfilePage() {
         }
     });
 
+    // Render all user posts.
     useEffect(() => {
         axios.get(`http://localhost:5000/api/user/${username}`)
             .then(res => {
@@ -31,6 +36,19 @@ function AuthorProfilePage() {
                 console.log(err);
             });
     }, []);
+
+    // Used to see if a user is subscribed or nah.
+    useEffect(() => {
+        axios.get("http://localhost:5000/api/subscriptions", { params: {
+            subscriber: myUsername, creator: authorUsername
+        }})
+            .then(res => {
+                setSubscriptionStatus(res.data.subscriptionStatus);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    });
 
     const handleDelete = async (postId) => {
         try {
@@ -48,6 +66,35 @@ function AuthorProfilePage() {
         }
     }
 
+    const handleSubscribe = async () => {
+        try {
+            await axios.post(`http://localhost:5000/api/subscribe`,
+                {subscriber: myUsername, creator: authorUsername});
+            setSubscriptionStatus("Subscribed");
+        } catch {
+            console.log("Error occurred!");
+        }
+    }
+
+    const handleUnsubscribe = async () => {
+        try {
+            await axios.post(`http://localhost:5000/api/unsubscribe`,
+                {subscriber: myUsername, creator: authorUsername});
+            setSubscriptionStatus("Not Subscribed");
+        } catch {
+            console.log("Error occurred!");
+        }
+    }
+
+    let subscriptionButton = null;
+    if (myUsername !== authorUsername) {
+        if (subscriptionStatus === "Subscribed") {
+            subscriptionButton = <button onClick={handleUnsubscribe} className="btn btn-danger shadow-sm w-25 mx-auto mb-3">Unsubscribe</button>
+        } else if (subscriptionStatus === "Not Subscribed") {
+            subscriptionButton = <button onClick={handleSubscribe} className="btn btn-dark shadow-sm w-25 mx-auto mb-3">Subscribe</button>
+        }
+    }
+
     return (
         <>
             <Navbar type="home"></Navbar>
@@ -58,7 +105,7 @@ function AuthorProfilePage() {
                         <div className="main-page d-flex flex-column">
                             <h1 className="text-center mx-5 my-3">Author Profile Page</h1>
                             <h3 className="text-center mx-5 my-3">User: {username}, Post count: {posts.length}</h3>
-                            <button className="btn btn-dark shadow-sm w-25 mx-auto mb-3">Subscribe</button>
+                            {subscriptionButton}
                             <ul className='px-0'>
                                 {posts.map(post => (
                                     <div key={post._id}>

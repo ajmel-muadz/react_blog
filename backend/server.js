@@ -88,6 +88,22 @@ async function createPost(newTitle, newContent, newTags, userId) {
         createdBy: userId
     });
     await post.save();
+    return post;
+}
+
+const subscriptionSchema = new mongoose.Schema({
+    subscriber: String,
+    creator: String
+})
+
+const Subscription = mongoose.model("Subscription", subscriptionSchema);
+
+async function createSubscription(newSubscriber, newCreator) {
+    const subscription = new Subscription({
+        subscriber: newSubscriber,
+        creator: newCreator
+    });
+    await subscription.save();
 }
 
 async function getPostsAndAddUsername(query) {
@@ -161,6 +177,36 @@ passport.deserializeUser(async (id, done) => {
 /* ---------------------------------------------------------------------------------------- */
 
 
+const server = app.listen(5000, () => {
+    console.log("Listening on port 5000 (React)");
+});
+
+const io = new Server(server, {
+    cors: {
+        origin: ["http://127.0.0.1:5173", "http://localhost:5173"],
+        methods: ["GET", "POST"]
+    }
+});
+
+// Used to show the active users on this blog site.
+const activeUsers = {};
+io.on('connection', socket => {
+    socket.on('user_connection', (username) => {
+        // Used to test if value in object. Credit: https://stackoverflow.com/a/57944826/14367246
+        let alreadyConnected = Object.values(activeUsers).includes(username);
+        if (!alreadyConnected) {
+            activeUsers[socket.id] = username;  // Adding an id and username to active users.
+        }
+        io.emit('active_users', activeUsers);
+    })
+
+    socket.on('disconnect', () => {
+        delete activeUsers[socket.id];
+        io.emit('active_users', activeUsers)
+    })
+})
+
+
 // Route handlers (IMPORTANT NOTE: This is API. So everything pre-fixed with API.)
 /* ---------------------------------------------------------------------------------------- */
 // Login page
@@ -223,34 +269,76 @@ app.post("/api/post/:postId/delete", async (req, res) => {
 
     res.json({message: "Post deleted successfully."});
 })
-/* ---------------------------------------------------------------------------------------- */
 
+// For creating a new post
+app.post("/api/newpost", async (req, res) => {
+    // Needed to get the user id from username, used to find post to add.
+    const user = await User.findOne({username: req.body.username});
 
-const server = app.listen(5000, () => {
-    console.log("Listening on port 5000 (React)");
-});
+    const userId = user._id;
+    const title = req.body.title;
+    const content = req.body.content;
+    const tags = req.body.tags;
+    const tagsArray = tags.split(" ");
 
-const io = new Server(server, {
-    cors: {
-        origin: ["http://127.0.0.1:5173", "http://localhost:5173"],
-        methods: ["GET", "POST"]
-    }
-});
+    const post = await createPost(title, content, tagsArray, userId);
 
-// Used to show the active users on this blog site.
-const activeUsers = {};
-io.on('connection', socket => {
-    socket.on('user_connection', (username) => {
-        // Used to test if value in object. Credit: https://stackoverflow.com/a/57944826/14367246
-        let alreadyConnected = Object.values(activeUsers).includes(username);
-        if (!alreadyConnected) {
-            activeUsers[socket.id] = username;
+    // Find subscribers of the author
+    const subscriptions = await Subscription.find({creator: req.body.username});
+    // We go through each subscriber of this author
+    for (const subscription of subscriptions) {
+        subscriber = subscription['subscriber'];
+        console.log(activeUsers);
+        for (const [key, value] of Object.entries(activeUsers)) {
+            // If one of the active users are the author's subscriber, we emit a post
+            if (value === subscriber) {
+                // key is the socketId saved in activeUsers
+                io.to(key).emit("new_post", {
+                    title: post.title,
+                    creator: req.body.username
+                })
+            }
         }
-        io.emit('active_users', activeUsers);
-    })
+    }
 
-    socket.on('disconnect', () => {
-        delete activeUsers[socket.id];
-        io.emit('active_users', activeUsers)
-    })
+    res.json({message: "Post created successfully."});
+});
+
+// For subscribing a user to an author
+app.post("/api/subscribe", async (req, res) => {
+    const subscriber = req.body.subscriber;
+    const creator = req.body.creator;
+
+    const checkExistingSubscription = await Subscription.findOne({subscriber: subscriber, creator: creator});
+    if (checkExistingSubscription) {
+        res.json({message: "This subscription already exists"});
+    } else {
+        await createSubscription(subscriber, creator);
+    }
+
+    res.json({message: `Subscription between ${subscriber} and ${creator} successful.`});
 })
+
+// For unsubscribing to an author
+app.post("/api/unsubscribe", async (req, res) => {
+    const subscriber = req.body.subscriber;
+    const creator = req.body.creator;
+
+    await Subscription.deleteOne({subscriber: subscriber, creator: creator});
+
+    res.json({message: `Unsubscribed between ${subscriber} and ${creator}`});
+})
+
+// For finding if a user is subscribed to a creator
+app.get("/api/subscriptions", async (req, res) => {
+    const subscriber = req.query.subscriber;
+    const creator = req.query.creator;
+
+    const checkExistingSubscription = await Subscription.findOne({subscriber: subscriber, creator: creator});
+    if (checkExistingSubscription) {
+        res.json({subscriptionStatus: "Subscribed"});
+    } else {
+        res.json({subscriptionStatus: "Not Subscribed"});
+    }
+})
+/* ---------------------------------------------------------------------------------------- */
