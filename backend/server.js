@@ -10,6 +10,7 @@ const bcrypt = require("bcrypt");
 const Joi = require("@hapi/joi");
 const cors = require("cors");
 const app = express();
+const { Server } = require('socket.io');
 /* ---------------------------------------------------------------------------------------- */
 
 
@@ -22,10 +23,7 @@ const saltRounds = 10;
 // Use commands
 /* ---------------------------------------------------------------------------------------- */
 app.use(flash());
-app.use(cors({
-    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
-    credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(flash());
@@ -218,9 +216,33 @@ app.post("/api/post/:postId/edit", async (req, res) => {
 
     res.json({message: "Post edited successfully."})
 });
+
+// For deleting a post
+app.post("/api/post/:postId/delete", async (req, res) => {
+    await Post.deleteOne({_id: req.params.postId});
+
+    res.json({message: "Post deleted successfully."});
+})
 /* ---------------------------------------------------------------------------------------- */
 
 
-app.listen(5000, () => {
+const server = app.listen(5000, () => {
     console.log("Listening on port 5000 (React)");
 });
+
+// const io = new Server(server, {
+//     cors: {
+//         origin: "http://127.0.0.1:5173",
+//         methods: ["GET", "POST"]
+//     }
+// });
+
+// io.on('connection', socket => {
+//     socket.on('user_connection', (username) => {
+//         console.log(`${username} has connected.`);
+//     })
+
+//     socket.on('disconnect', () => {
+//         console.log("User disconnected");
+//     })
+// })

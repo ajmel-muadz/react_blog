@@ -6,10 +6,18 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 function AuthorProfilePage() {
     const [posts, setPosts] = useState([]);
     const { username } = useParams();
+    const [postId, setPostId] = useState('');
     const navigate = useNavigate();
 
+    // Now opposite. If the user is unauthorised, we want to go back.
     useEffect(() => {
-        if (localStorage.getItem('user') === '') {
+        // First check if 'user' key even exists
+        if (localStorage.getItem('user')) {
+            if (localStorage.getItem('user') === '') {  // If 'user' is empty, we go back to /login.
+                navigate('/login');
+            }
+        } else {
+            // In case user key does not even exist, we're just gonna go back to /login.
             navigate('/login');
         }
     });
@@ -24,6 +32,22 @@ function AuthorProfilePage() {
             });
     }, []);
 
+    const handleDelete = async (postId) => {
+        try {
+            await axios.post(`http://localhost:5000/api/post/${postId}/delete`)
+            // Re run fetch again to update the view.
+            axios.get(`http://localhost:5000/api/user/${username}`)
+                .then(res => {
+                    setPosts(res.data.usersPosts);
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        } catch {
+            console.log("Error occurred!");
+        }
+    }
+
     return (
         <>
             <Navbar type="home"></Navbar>
@@ -35,13 +59,29 @@ function AuthorProfilePage() {
                             <h1 className="text-center mx-5 my-3">Author Profile Page</h1>
                             <h3 className="text-center mx-5 my-3">User: {username}, Post count: {posts.length}</h3>
                             <button className="btn btn-dark shadow-sm w-25 mx-auto mb-3">Subscribe</button>
-                            <ul className="px-0">
-                                {posts.map(post =>
-                                <div key={post._id} className="container my-3 py-4 px-4 bg-dark text-white rounded-3 shadow-lg">
-                                    <h3>{post.title}</h3>
-                                    <strong>Tags: </strong>
-                                    {(post.tags).map(tag => <span key={tag}>#{tag} </span>)}
-                                </div>)}
+                            <ul className='px-0'>
+                                {posts.map(post => (
+                                    <div key={post._id}>
+                                        <div className="container my-3 py-4 px-4 bg-dark text-white rounded-3 shadow-lg">
+                                            <h3>{post.title}</h3>
+                                            <p>{post.content}</p>
+                                            <strong>Tags: </strong>
+                                            {(post.tags).map(tag => <span key={tag}>#{tag} </span>)}
+                                            <br />
+                                            <strong>Created at: </strong>
+                                            <span>{post.createdAt}</span>
+                                        </div>
+
+                                        {/* If the current user matches post author, allow editing or delete. */}
+                                        {localStorage.getItem('user') === username ?
+                                        <div className="d-flex flex-row">
+                                            <button onClick={() => handleDelete(post._id)} className="btn btn-danger shadow me-3">Delete</button>
+                                            <Link to={`/post/${post._id}/edit`}>
+                                                <button className="btn btn-warning shadow">Edit</button>
+                                            </Link>
+                                        </div> : null}
+                                    </div>  
+                                ))}
                             </ul>
                         </div>
                     </div>

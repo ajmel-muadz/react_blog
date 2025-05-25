@@ -8,8 +8,15 @@ function PostDetailsPage() {
     const { postId } = useParams();
     const navigate = useNavigate();
 
+    // Now opposite. If the user is unauthorised, we want to go back.
     useEffect(() => {
-        if (localStorage.getItem('user') === '') {
+        // First check if 'user' key even exists
+        if (localStorage.getItem('user')) {
+            if (localStorage.getItem('user') === '') {  // If 'user' is empty, we go back to /login.
+                navigate('/login');
+            }
+        } else {
+            // In case user key does not even exist, we're just gonna go back to /login.
             navigate('/login');
         }
     });
@@ -23,6 +30,15 @@ function PostDetailsPage() {
                 console.log(err);
             })
     }, []);
+
+    const handleDelete = async () => {
+        try {
+            const res = await axios.post(`http://localhost:5000/api/post/${postId}/delete`)
+            navigate("/home");
+        } catch {
+            console.log("Error occurred!");
+        }
+    }
 
     return (
         <>
@@ -51,7 +67,7 @@ function PostDetailsPage() {
                                 {/* If the current user matches post author, allow editing or delete. */}
                                 {localStorage.getItem('user') === post.createdBy ?
                                 <div className="d-flex flex-row">
-                                    <button className="btn btn-danger shadow me-3">Delete</button>
+                                    <button onClick={handleDelete} className="btn btn-danger shadow me-3">Delete</button>
                                     <Link to={`/post/${postId}/edit`}>
                                         <button className="btn btn-warning shadow">Edit</button>
                                     </Link>

@@ -5,6 +5,9 @@ import PostDetailsPage from './components/PostDetailsPage';
 import AuthorProfilePage from './components/AuthorProfilePage';
 import EditPostPage from './components/EditPostPage';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import io from 'socket.io-client';
+import { useEffect } from 'react';
+const socket = io.connect("http://localhost:5000");
 
 function App() {
   return (

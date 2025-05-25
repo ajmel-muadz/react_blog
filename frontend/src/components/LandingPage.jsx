@@ -6,8 +6,11 @@ function LandingPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (localStorage.getItem('user') != '') {
-            navigate("/home");
+        // First check if 'user' key even exists
+        if (localStorage.getItem('user')) {
+            if (localStorage.getItem('user') !== '') {  // If 'user' exists and is not empty, we fast-track.
+                navigate('/home');
+            }
         }
     });
 

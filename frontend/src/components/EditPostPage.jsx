@@ -13,9 +13,16 @@ function EditPostPage() {
 
     const navigate = useNavigate();
 
+    // Now opposite. If the user is unauthorised, we want to go back.
     useEffect(() => {
-        if (localStorage.getItem('user') === '') {
-            navigate("/login");
+        // First check if 'user' key even exists
+        if (localStorage.getItem('user')) {
+            if (localStorage.getItem('user') === '') {  // If 'user' is empty, we go back to /login.
+                navigate('/login');
+            }
+        } else {
+            // In case user key does not even exist, we're just gonna go back to /login.
+            navigate('/login');
         }
     });
 
@@ -40,7 +47,6 @@ function EditPostPage() {
             const res = await axios.post(`http://localhost:5000/api/post/${postId}/edit`,
                 {title: editTitle, content: editContent, tags: editTag});
 
-            console.log("Edit successful, navigating to /home")
             navigate("/home");
 
         } catch {

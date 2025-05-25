@@ -8,9 +8,16 @@ function HomePage() {
     const [posts, setPosts] = useState([]);  // Initially empty array
     const navigate = useNavigate();
 
+    // Now opposite. If the user is unauthorised, we want to go back.
     useEffect(() => {
-        if (localStorage.getItem('user') === '') {
-            navigate("/login");
+        // First check if 'user' key even exists
+        if (localStorage.getItem('user')) {
+            if (localStorage.getItem('user') === '') {  // If 'user' is empty, we go back to /login.
+                navigate('/login');
+            }
+        } else {
+            // In case user key does not even exist, we're just gonna go back to /login.
+            navigate('/login');
         }
     });
 
