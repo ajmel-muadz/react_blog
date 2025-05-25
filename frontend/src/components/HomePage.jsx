@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 
-function HomePage() {
+function HomePage(props) {
     const [username, setUsername] = useState('');
     const [posts, setPosts] = useState([]);  // Initially empty array
+    const [activeUsersObject, setActiveUsersObject] = useState({});
+    const [activeUsers, setActiveUsers] = useState([]);
     const navigate = useNavigate();
 
     // Now opposite. If the user is unauthorised, we want to go back.
@@ -32,6 +34,18 @@ function HomePage() {
             });
     }, []);
 
+    useEffect(() => {
+        setActiveUsersObject(props.activeUsers);
+    }, [props.activeUsers]) // Every time this changes we want to update again.
+
+    useEffect(() => {
+        const array = []
+        for (const [key, value] of Object.entries(activeUsersObject)) {
+            array.push(value);
+        }
+        setActiveUsers(array);
+    }, [activeUsersObject])
+
     return (
         <>
             <style>
@@ -47,6 +61,7 @@ function HomePage() {
                         <div className="d-flex flex-column">
                             <h1 className='text-center mx-5 my-3'>Users</h1>
                             <div className="container my-3 py-4 px-4 bg-dark text-white rounded-3 shadow-lg">
+                                {activeUsers.map(user => <p><Link key={user} to={`/user/${user}`}>{user}</Link></p>)}
                             </div>
                         </div>
                     </div>

@@ -230,19 +230,24 @@ const server = app.listen(5000, () => {
     console.log("Listening on port 5000 (React)");
 });
 
-// const io = new Server(server, {
-//     cors: {
-//         origin: "http://127.0.0.1:5173",
-//         methods: ["GET", "POST"]
-//     }
-// });
+const io = new Server(server, {
+    cors: {
+        origin: "http://127.0.0.1:5173",
+        methods: ["GET", "POST"]
+    }
+});
 
-// io.on('connection', socket => {
-//     socket.on('user_connection', (username) => {
-//         console.log(`${username} has connected.`);
-//     })
+const activeUsers = {};
+io.on('connection', socket => {
+    socket.on('user_connection', (username) => {
+        activeUsers[socket.id] = username;
+        console.log(activeUsers);
+        io.emit('active_users', activeUsers);
+    })
 
-//     socket.on('disconnect', () => {
-//         console.log("User disconnected");
-//     })
-// })
+    socket.on('disconnect', () => {
+        delete activeUsers[socket.id];
+        console.log(activeUsers);
+        io.emit('active_users', activeUsers)
+    })
+})
