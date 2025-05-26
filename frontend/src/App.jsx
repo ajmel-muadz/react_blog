@@ -1,10 +1,12 @@
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
+import RegisterPage from './components/RegisterPage';
 import HomePage from './components/HomePage';
 import PostDetailsPage from './components/PostDetailsPage';
 import AuthorProfilePage from './components/AuthorProfilePage';
 import EditPostPage from './components/EditPostPage';
 import NewPostPage from './components/NewPostPage';
+import SubscriptionsPage from './components/SubscriptionsPage';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import { useEffect, useState } from 'react';
@@ -23,12 +25,14 @@ function App() {
     }
   }, []);
 
+  // We get active users from the server socket io
   useEffect(() => {
     socket.on('active_users', (data) => {
       setActiveUsers(data);
     })
   }, []);
 
+  // Notification for a new post
   useEffect(() => {
     socket.on("new_post", (data) => {
       const message = `New post by ${data['creator']}: ${data['title']}`;
@@ -37,7 +41,7 @@ function App() {
       // After 5 seconds we close the notif
       setTimeout(() => setNotification(''), 5000);
     })
-  }, []);
+  });
 
   return (
     <>
@@ -51,12 +55,13 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage/>} />
         <Route path="/login" element={<LoginPage/>} />
-        <Route path="/register" element="Register page" />
+        <Route path="/register" element={<RegisterPage/>} />
         <Route path="/home" element={<HomePage activeUsers={activeUsers}/>} />
         <Route path="/post/:postId" element={<PostDetailsPage/>}/>
         <Route path="/user/:username" element={<AuthorProfilePage/>}/>
         <Route path="/post/:postId/edit" element={<EditPostPage/>}/>
         <Route path="/newpost" element={<NewPostPage/>}/>
+        <Route path="/subscriptions" element={<SubscriptionsPage/>}/>
         <Route path="*" element={<Navigate to="/home" />} />
       </Routes>
     </>

@@ -214,6 +214,32 @@ app.post("/api/login", passport.authenticate("local"), (req, res) => {
     res.json({message: "Logged in", user: req.user.username});
 });
 
+// Register page
+app.post("/api/register", async (req, res) => {
+    const username = req.body.newUsername;
+    const password = req.body.newPassword;
+    const confirmPassword = req.body.confirmPassword
+
+    const userFound = await User.findOne({username: username})
+
+    if (userFound !== null) {
+        return res.status(400).json({error: "Username already exists"});
+    } else {
+        if (password === confirmPassword) {
+            encryptedPassword = bcrypt.hash(password, saltRounds, function(err, hash) {
+                if (err) {
+                    return res.status(400).json({error: "Something wrong happened with registration"});
+                } else {
+                    createUser(username, hash);
+                    res.json({message: "Registration successful", user: req.body.newUsername});
+                }
+            });
+        } else {
+            return res.status(400).json({error: "Passwords do not match!"});
+        }
+    }
+});
+
 // Home page
 app.get("/api/home", async (req, res) => {
     const query = req.query.search;
