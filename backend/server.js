@@ -341,4 +341,15 @@ app.get("/api/subscriptions", async (req, res) => {
         res.json({subscriptionStatus: "Not Subscribed"});
     }
 })
+
+// For finding all creators a user is subscribed to.
+app.get("/api/allsubscriptions", async (req, res) => {
+    const findAllSubscriptions = await Subscription.find({subscriber: req.query.subscriber});
+
+    const creators = []
+    for (const subscription of findAllSubscriptions) {
+        creators.push(subscription['creator']);
+    }
+    res.json({allsubscriptions: creators});
+})
 /* ---------------------------------------------------------------------------------------- */
