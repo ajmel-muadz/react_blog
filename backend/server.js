@@ -11,6 +11,7 @@ const Joi = require("@hapi/joi");
 const cors = require("cors");
 const app = express();
 const { Server } = require('socket.io');
+require('dotenv').config();
 /* ---------------------------------------------------------------------------------------- */
 
 
@@ -41,7 +42,7 @@ app.use(passport.session());
 // MongoDB and Mongoose stuff
 /* ---------------------------------------------------------------------------------------- */
 // Connecting to my MongoDB database
-mongoose.connect("***REMOVED***")
+mongoose.connect(process.env.MONGO_URI)
 .then(() => {
     console.log("Connected to MongoDB");
 }
