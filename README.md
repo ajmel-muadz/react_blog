@@ -4,4 +4,7 @@ This is a blog site built using the MERN tech stack - MongoDB, Express, React an
 
 # How to run the program
 
-- Step 1
+1) In the `react_blog` (root folder), navigate to `/backend`. Enter this command:
+    `cd backend`
+
+2) 
